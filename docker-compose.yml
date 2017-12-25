@@ -1,0 +1,35 @@
+version: '2'
+services:
+  db:
+    image: postgres:alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=serten
+      - POSTGRES_PASSWORD=cbmrn2017
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+  web:
+    image: bitnami/tomcat:latest
+    ports:
+      - '8080:8080'
+    environment:
+      - TOMCAT_USERNAME=saps
+      - TOMCAT_PASSWORD=cbmrn2017
+    volumes:
+      - ./tomcat:/bitnami/tomcat
+    depends_on:
+      - db
+  nginx:
+    image: nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx:/etc/nginx
+    command: [nginx-debug, '-g', 'daemon off;']
+    links:
+      - web
+    depends_on:
+      - web
